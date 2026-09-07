@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Welcome Back - Login</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --primary: #6366f1;
+            --primary-hover: #4f46e5;
+            --bg-gradient: linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #311042 100%);
+            --card-bg: rgba(255, 255, 255, 0.95);
+            --text-main: #1e293b;
+            --text-muted: #64748b;
+            --border-color: #e2e8f0;
+            --error-bg: #fef2f2;
+            --error-text: #991b1b;
+            --error-border: #ef4444;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', sans-serif;
+        }
+
+        body {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--bg-gradient);
+            padding: 20px;
+            overflow-x: hidden;
+        }
+
+        /* Ambient background glow elements */
+        .glow {
+            position: absolute;
+            width: 300px;
+            height: 300px;
+            background: rgba(99, 102, 241, 0.35);
+            filter: blur(120px);
+            border-radius: 50%;
+            z-index: 0;
+        }
+        .glow-1 { top: 10%; left: 15%; }
+        .glow-2 { bottom: 10%; right: 15%; background: rgba(236, 72, 153, 0.3); }
+
+        .login-card {
+            position: relative;
+            z-index: 1;
+            width: 100%;
+            max-width: 420px;
+            background: var(--card-bg);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 24px;
+            padding: 40px 32px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.35);
+            animation: fadeIn 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px) scale(0.98); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 32px;
+        }
+
+        .header h1 {
+            font-size: 1.85rem;
+            font-weight: 700;
+            color: var(--text-main);
+            letter-spacing: -0.025em;
+            margin-bottom: 8px;
+        }
+
+        .header p {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+        }
+
+        /* Error Banner */
+        .error-banner {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: var(--error-bg);
+            border-left: 4px solid var(--error-border);
+            color: var(--error-text);
+            padding: 12px 16px;
+            border-radius: 8px;
+            font-size: 0.875rem;
+            margin-bottom: 24px;
+            animation: shake 0.4s ease-in-out;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            20%, 60% { transform: translateX(-5px); }
+            40%, 80% { transform: translateX(5px); }
+        }
+
+        /* Form Controls */
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--text-main);
+            margin-bottom: 8px;
+        }
+
+        .input-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .input-wrapper i.field-icon {
+            position: absolute;
+            left: 16px;
+            color: var(--text-muted);
+            font-size: 0.95rem;
+            transition: color 0.25s ease;
+        }
+
+        .input-wrapper input {
+            width: 100%;
+            padding: 12px 16px 12px 42px;
+            border: 2px solid var(--border-color);
+            border-radius: 12px;
+            font-size: 0.95rem;
+            color: var(--text-main);
+            background: #f8fafc;
+            transition: all 0.25s ease;
+            outline: none;
+        }
+
+        .input-wrapper input:focus {
+            border-color: var(--primary);
+            background: #ffffff;
+            box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.15);
+        }
+
+        .input-wrapper input:focus + .field-icon,
+        .input-wrapper:focus-within i.field-icon {
+            color: var(--primary);
+        }
+
+        /* Toggle Password Visibility */
+        .toggle-password {
+            position: absolute;
+            right: 16px;
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            cursor: pointer;
+            font-size: 0.95rem;
+            padding: 0;
+        }
+
+        .toggle-password:hover {
+            color: var(--text-main);
+        }
+
+        .submit-btn {
+            width: 100%;
+            padding: 14px;
+            margin-top: 10px;
+            background: var(--primary);
+            color: #ffffff;
+            border: none;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            box-shadow: 0 10px 15px -3px rgba(99, 102, 241, 0.3);
+        }
+
+        .submit-btn:hover {
+            background: var(--primary-hover);
+            transform: translateY(-1px);
+            box-shadow: 0 12px 20px -3px rgba(99, 102, 241, 0.4);
+        }
+
+        .submit-btn:active {
+            transform: translateY(0);
+        }
+
+        .footer {
+            margin-top: 28px;
+            text-align: center;
+            font-size: 0.9rem;
+            color: var(--text-muted);
+        }
+
+        .footer a {
+            color: var(--primary);
+            font-weight: 600;
+            text-decoration: none;
+            transition: color 0.2s ease;
+        }
+
+        .footer a:hover {
+            color: var(--primary-hover);
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="glow glow-1"></div>
+    <div class="glow glow-2"></div>
+
+    <div class="login-card">
+        <div class="header">
+            <h1>Welcome Back</h1>
+            <p>Please enter your credentials to log in.</p>
+        </div>
+
+        {% if error %}
+            <div class="error-banner">
+                <i class="fa-solid fa-circle-exclamation"></i>
+                <span>{{ error }}</span>
+            </div>
+        {% endif %}
+
+        <form method="POST">
+            {% csrf_token %}
+
+            <div class="form-group">
+                <label for="id_username">Username</label>
+                <div class="input-wrapper">
+                    <input type="text" id="id_username" name="username" placeholder="Enter your username" required autocomplete="username">
+                    <i class="fa-solid fa-user field-icon"></i>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="id_password">Password</label>
+                <div class="input-wrapper">
+                    <input type="password" id="id_password" name="password" placeholder="Enter your password" required autocomplete="current-password">
+                    <i class="fa-solid fa-lock field-icon"></i>
+                    <button type="button" class="toggle-password" id="togglePassword" aria-label="Toggle password visibility">
+                        <i class="fa-solid fa-eye" id="eyeIcon"></i>
+                    </button>
+                </div>
+            </div>
+
+            <button type="submit" class="submit-btn">
+                <span>Sign In</span>
+                <i class="fa-solid fa-right-to-bracket"></i>
+            </button>
+        </form>
+
+        <div class="footer">
+            Don't have an account? <a href="{% url 'register' %}">Register</a>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const togglePasswordBtn = document.getElementById('togglePassword');
+            const passwordInput = document.getElementById('id_password');
+            const eyeIcon = document.getElementById('eyeIcon');
+
+            // Interactive show/hide password toggle
+            if (togglePasswordBtn && passwordInput) {
+                togglePasswordBtn.addEventListener('click', () => {
+                    const isPassword = passwordInput.getAttribute('type') === 'password';
+                    passwordInput.setAttribute('type', isPassword ? 'text' : 'password');
+                    
+                    eyeIcon.classList.toggle('fa-eye', !isPassword);
+                    eyeIcon.classList.toggle('fa-eye-slash', isPassword);
+                });
+            }
+        });
+    </script>
+</body>
+</html>

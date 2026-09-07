@@ -1,0 +1,214 @@
+<!--
+<h1>Trading Analytics</h1>
+
+<p>Total Trades: {{ analytics.total_trades }}</p>
+
+<p>Winning Trades: {{ analytics.winning_trades }}</p>
+
+<p>Losing Trades: {{ analytics.losing_trades }}</p>
+
+<p>Break-even Trades: {{ analytics.break_even_trades }}</p>
+
+<p>Win Rate: {{ analytics.win_rate|floatformat:2 }}%</p>
+
+<p>Total PnL: {{ analytics.total_pnl|floatformat:2 }}</p> -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trading Analytics</title>
+    <style>
+        :root {
+            --bg-dark: #0b0f19;
+            --card-bg: #151c2c;
+            --card-border: #232d42;
+            --text-main: #f1f5f9;
+            --text-muted: #94a3b8;
+            --green: #10b981;
+            --red: #ef4444;
+            --yellow: #f59e0b;
+            --blue: #3b82f6;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            padding: 32px 16px;
+        }
+
+        .analytics-container {
+            max-width: 1100px;
+            margin: 0 auto;
+        }
+
+        .dashboard-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid var(--card-border);
+        }
+
+        .dashboard-header h1 {
+            font-size: 1.75rem;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+        }
+
+        /* Metrics Grid */
+        .analytics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 16px;
+        }
+
+        .metric-card {
+            background-color: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 12px;
+            padding: 20px;
+            transition: transform 0.2s ease, border-color 0.2s ease;
+        }
+
+        .metric-card:hover {
+            transform: translateY(-2px);
+            border-color: #334155;
+        }
+
+        .metric-title {
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            color: var(--text-muted);
+            margin-bottom: 10px;
+        }
+
+        .metric-value {
+            font-size: 1.75rem;
+            font-weight: 700;
+            display: flex;
+            align-items: baseline;
+            gap: 4px;
+        }
+
+        .metric-sub {
+            font-size: 0.85rem;
+            font-weight: 500;
+            margin-top: 6px;
+            color: var(--text-muted);
+        }
+
+        /* Color classes */
+        .text-green { color: var(--green); }
+        .text-red { color: var(--red); }
+        .text-yellow { color: var(--yellow); }
+        .text-blue { color: var(--blue); }
+
+        /* Highlight card for PnL */
+        .pnl-card-green {
+            background: linear-gradient(135deg, #151c2c 0%, rgba(16, 185, 129, 0.08) 100%);
+            border-color: rgba(16, 185, 129, 0.3);
+        }
+
+        .pnl-card-red {
+            background: linear-gradient(135deg, #151c2c 0%, rgba(239, 68, 68, 0.08) 100%);
+            border-color: rgba(239, 68, 68, 0.3);
+        }
+    </style>
+</head>
+<body>
+
+<div class="analytics-container">
+
+    <div class="dashboard-header">
+        <h1>Trading Analytics</h1>
+    </div>
+
+    <div class="analytics-grid">
+
+        <!-- Total PnL Card -->
+        <div class="metric-card {% if analytics.total_pnl >= 0 %}pnl-card-green{% else %}pnl-card-red{% endif %}">
+            <div class="metric-title">Total PnL</div>
+            <div class="metric-value {% if analytics.total_pnl >= 0 %}text-green{% else %}text-red{% endif %}">
+                {% if analytics.total_pnl >= 0 %}+{% endif %}${{ analytics.total_pnl|floatformat:2 }}
+            </div>
+            <div class="metric-sub">Net Realized PnL</div>
+        </div>
+
+        <!-- Win Rate Card -->
+        <div class="metric-card">
+            <div class="metric-title">Win Rate</div>
+            <div class="metric-value text-blue">
+                {{ analytics.win_rate|floatformat:1 }}%
+            </div>
+            <div class="metric-sub">Success Percentage</div>
+        </div>
+
+        <!-- Profit Factor Card -->
+        <div class="metric-card">
+            <div class="metric-title">Profit Factor</div>
+            <div class="metric-value {% if analytics.profit_factor >= 1.5 %}text-green{% elif analytics.profit_factor >= 1.0 %}text-yellow{% else %}text-red{% endif %}">
+                {{ analytics.profit_factor|floatformat:2 }}
+            </div>
+            <div class="metric-sub">Gross Win / Gross Loss</div>
+        </div>
+
+        <!-- Expectancy Card -->
+        <div class="metric-card">
+            <div class="metric-title">Expectancy</div>
+            <div class="metric-value {% if analytics.expectancy >= 0 %}text-green{% else %}text-red{% endif %}">
+                ${{ analytics.expectancy|floatformat:2 }}
+            </div>
+            <div class="metric-sub">Expected Return per Trade</div>
+        </div>
+
+        <!-- Total Trades Card -->
+        <div class="metric-card">
+            <div class="metric-title">Total Trades</div>
+            <div class="metric-value">
+                {{ analytics.total_trades }}
+            </div>
+            <div class="metric-sub">Executed Positions</div>
+        </div>
+
+        <!-- Average Win & Loss Card -->
+        <div class="metric-card">
+            <div class="metric-title">Avg Win / Loss</div>
+            <div class="metric-value" style="font-size: 1.25rem; gap: 8px;">
+                <span class="text-green">+${{ analytics.average_win_trade|floatformat:2 }}</span>
+                <span style="color: var(--text-muted);">/</span>
+                <span class="text-red">-${{ analytics.average_loss_trade|floatformat:2 }}</span>
+            </div>
+            <div class="metric-sub">Average Performance</div>
+        </div>
+
+        <!-- W / L / BE Ratio Card -->
+        <div class="metric-card">
+            <div class="metric-title">Outcome Breakdown</div>
+            <div class="metric-value" style="font-size: 1.25rem; gap: 8px;">
+                <span class="text-green">{{ analytics.winning_trades }}W</span>
+                <span style="color: var(--text-muted);">|</span>
+                <span class="text-red">{{ analytics.losing_trades }}L</span>
+                <span style="color: var(--text-muted);">|</span>
+                <span class="text-yellow">{{ analytics.break_even_trades }}BE</span>
+            </div>
+            <div class="metric-sub">Wins vs Losses vs BE</div>
+        </div>
+
+    </div>
+
+</div>
+
+</body>
+</html>

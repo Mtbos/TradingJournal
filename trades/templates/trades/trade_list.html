@@ -1,0 +1,737 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trading Journal Dashboard</title>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        :root {
+            --bg-color: #0b0f19;
+            --card-bg: rgba(20, 27, 45, 0.75);
+            --card-border: rgba(255, 255, 255, 0.08);
+            --accent-blue: #38bdf8;
+            --accent-green: #22c55e;
+            --accent-red: #ef4444;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --glass-glow: rgba(56, 189, 248, 0.05);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            background-image: 
+                radial-gradient(at 10% 10%, rgba(56, 189, 248, 0.08) 0px, transparent 40%),
+                radial-gradient(at 90% 90%, rgba(99, 102, 241, 0.08) 0px, transparent 40%);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* HEADER */
+        header {
+            background: rgba(15, 23, 42, 0.8);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--card-border);
+            padding: 16px 32px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1.25rem;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+            background: linear-gradient(135deg, #ffffff 0%, var(--accent-blue) 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        nav {
+            display: flex;
+            gap: 12px;
+        }
+
+        .nav-btn {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 9px 16px;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.2s ease;
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--text-main);
+            border: 1px solid var(--card-border);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: rgba(255, 255, 255, 0.2);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #38bdf8 0%, #0284c7 100%);
+            color: #ffffff;
+            box-shadow: 0 4px 12px rgba(2, 132, 199, 0.3);
+            border: none;
+            cursor: pointer;
+        }
+
+        .btn-primary:hover {
+            opacity: 0.95;
+            transform: translateY(-1px);
+            box-shadow: 0 6px 16px rgba(2, 132, 199, 0.4);
+        }
+
+        /* MAIN CONTENT AREA */
+        main {
+            flex: 1;
+            max-width: 1200px;
+            width: 100%;
+            margin: 0 auto;
+            padding: 32px 24px;
+        }
+
+        /* DYNAMIC METRICS OVERVIEW */
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 16px;
+            margin-bottom: 32px;
+        }
+
+        .metric-card {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 12px;
+            padding: 20px;
+            backdrop-filter: blur(8px);
+        }
+
+        .metric-card span {
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-muted);
+            font-weight: 600;
+        }
+
+        .metric-card h2 {
+            font-size: 1.6rem;
+            margin-top: 6px;
+            font-weight: 700;
+        }
+
+        /* FILTER CONTAINER STYLES */
+        .filter-container {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 12px;
+            padding: 16px;
+            backdrop-filter: blur(8px);
+            margin-bottom: 20px;
+        }
+
+        .trade-filter {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .trade-filter input[type="text"],
+        .trade-filter select {
+            background: rgba(15, 23, 42, 0.6);
+            border: 1px solid var(--card-border);
+            color: var(--text-main);
+            padding: 10px 14px;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            outline: none;
+            transition: border-color 0.2s ease;
+        }
+
+        .trade-filter input[type="text"] {
+            flex: 1;
+            min-width: 180px;
+        }
+
+        .trade-filter select {
+            min-width: 130px;
+            cursor: pointer;
+        }
+
+        .trade-filter select option {
+            background: var(--bg-color);
+            color: var(--text-main);
+        }
+
+        .trade-filter input[type="text"]:focus,
+        .trade-filter select:focus {
+            border-color: var(--accent-blue);
+        }
+
+        .trade-filter button[type="submit"] {
+            padding: 10px 18px;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+
+        .clear-btn {
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 0.85rem;
+            font-weight: 600;
+            padding: 8px 12px;
+            border-radius: 6px;
+            transition: color 0.2s ease, background 0.2s ease;
+        }
+
+        .clear-btn:hover {
+            color: var(--accent-red);
+            background: rgba(239, 68, 68, 0.1);
+        }
+
+        .active-filters {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 24px;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+
+        .active-filters span {
+            background: rgba(56, 189, 248, 0.1);
+            color: var(--accent-blue);
+            border: 1px solid rgba(56, 189, 248, 0.25);
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-weight: 600;
+        }
+
+        /* SECTION HEADER */
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .section-header h2 {
+            font-size: 1.3rem;
+            font-weight: 600;
+        }
+
+        /* TRADE CARDS GRID */
+        .trades-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+            gap: 20px;
+        }
+
+        .trade-card {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 14px;
+            padding: 20px;
+            position: relative;
+            backdrop-filter: blur(12px);
+            transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .trade-card:hover {
+            transform: translateY(-4px);
+            border-color: rgba(56, 189, 248, 0.4);
+            box-shadow: 0 12px 24px rgba(0, 0, 0, 0.3), 0 0 15px var(--glass-glow);
+        }
+
+        .trade-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid var(--card-border);
+        }
+
+        .symbol-tag {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .symbol-tag h3 {
+            font-size: 1.1rem;
+            font-weight: 700;
+        }
+
+        .badge-side {
+            font-size: 0.75rem;
+            font-weight: 700;
+            padding: 3px 8px;
+            border-radius: 6px;
+            text-transform: uppercase;
+        }
+
+        .badge-long {
+            background: rgba(34, 197, 94, 0.15);
+            color: var(--accent-green);
+            border: 1px solid rgba(34, 197, 94, 0.3);
+        }
+
+        .badge-short {
+            background: rgba(239, 68, 68, 0.15);
+            color: var(--accent-red);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+        }
+
+        .trade-body {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .data-point {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .data-point label {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            margin-bottom: 2px;
+        }
+
+        .data-point span {
+            font-size: 0.95rem;
+            font-weight: 600;
+        }
+
+        .pnl-positive {
+            color: var(--accent-green);
+        }
+
+        .pnl-negative {
+            color: var(--accent-red);
+        }
+
+        .trade-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: auto;
+        }
+
+        .action-link {
+            flex: 1;
+            text-align: center;
+            padding: 8px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            border-radius: 6px;
+            text-decoration: none;
+            transition: background 0.2s ease;
+        }
+
+        .link-update {
+            background: rgba(56, 189, 248, 0.1);
+            color: var(--accent-blue);
+        }
+
+        .link-update:hover {
+            background: rgba(56, 189, 248, 0.25);
+        }
+
+        .link-delete {
+            background: rgba(239, 68, 68, 0.1);
+            color: var(--accent-red);
+        }
+
+        .link-delete:hover {
+            background: rgba(239, 68, 68, 0.25);
+        }
+
+        /* EMPTY STATE */
+        .empty-state {
+            grid-column: 1 / -1;
+            text-align: center;
+            padding: 60px 20px;
+            background: var(--card-bg);
+            border: 1px dashed var(--card-border);
+            border-radius: 16px;
+        }
+
+        .empty-state i {
+            stroke: var(--text-muted);
+            margin-bottom: 12px;
+        }
+
+        .empty-state p {
+            color: var(--text-muted);
+            margin-bottom: 20px;
+        }
+
+        /* FOOTER */
+        footer {
+            background: rgba(15, 23, 42, 0.8);
+            border-top: 1px solid var(--card-border);
+            padding: 20px 32px;
+            text-align: center;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-top: auto;
+        }
+
+        /* PROFILE DROPDOWN COMPONENT */
+        .profile-container {
+            position: relative;
+            display: inline-block;
+        }
+
+        .profile-btn {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--card-border);
+            padding: 5px 12px 5px 5px;
+            border-radius: 30px;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            color: var(--text-main);
+        }
+
+        .profile-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: rgba(255, 255, 255, 0.2);
+        }
+
+        .avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #38bdf8 0%, #818cf8 100%);
+            color: #ffffff;
+            font-weight: 700;
+            font-size: 0.85rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 0 10px rgba(56, 189, 248, 0.3);
+        }
+
+        .username {
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: var(--text-main);
+        }
+
+        .arrow-icon {
+            transition: transform 0.25s ease;
+        }
+
+        .dropdown-menu {
+            position: absolute;
+            right: 0;
+            top: calc(100% + 10px);
+            width: 220px;
+            background: rgba(15, 23, 42, 0.95);
+            backdrop-filter: blur(16px);
+            border: 1px solid var(--card-border);
+            border-radius: 14px;
+            padding: 8px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-8px);
+            transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+            z-index: 100;
+        }
+
+        .profile-container.active .dropdown-menu {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
+        .profile-container.active .arrow-icon {
+            transform: rotate(180deg);
+        }
+
+        .user-info {
+            padding: 8px 12px;
+        }
+
+        .user-info-name {
+            font-size: 0.875rem;
+            font-weight: 700;
+            color: var(--text-main);
+        }
+
+        .user-info-email {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            margin-top: 2px;
+        }
+
+        .dropdown-divider {
+            height: 1px;
+            background: var(--card-border);
+            margin: 6px 0;
+        }
+
+        .logout-form {
+            margin: 0;
+            width: 100%;
+        }
+
+        .logout-btn {
+            width: 100%;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px 12px;
+            background: transparent;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--accent-red);
+            cursor: pointer;
+            transition: background 0.2s ease;
+            text-align: left;
+        }
+
+        .logout-btn:hover {
+            background: rgba(239, 68, 68, 0.12);
+        }
+        
+    </style>
+</head>
+
+<body>
+
+<header>
+    <div class="brand">
+        <i data-lucide="candlestick-chart"></i>
+        <span>TradeJournal</span>
+    </div>
+    <nav>
+        <a href="{% url 'analytics' %}" class="nav-btn btn-secondary">
+            <i data-lucide="bar-chart-2" style="width: 16px; height: 16px;"></i>
+            Analytics
+        </a>
+        <a href="{% url 'add_trade' %}" class="nav-btn btn-primary">
+            <i data-lucide="plus" style="width: 16px; height: 16px;"></i>
+            New Trade
+        </a>
+
+        <!-- USER PROFILE DROPDOWN WITH LOGOUT -->
+        <div class="profile-container">
+            <button type="button" class="profile-btn" id="profileDropdownBtn">
+                <div class="avatar">
+                    {{ request.user.username|slice:":1"|upper }}
+                </div>
+                <span class="username">{{ request.user.username }}</span>
+                <i data-lucide="chevron-down" class="arrow-icon" style="width: 14px; height: 14px;"></i>
+            </button>
+
+            <div class="dropdown-menu" id="profileDropdown">
+                <div class="user-info">
+                    <p class="user-info-name">{{ request.user.username }}</p>
+                    <p class="user-info-email">{{ request.user.email|default:"Trader Account" }}</p>
+                </div>
+                
+                <div class="dropdown-divider"></div>
+
+                <!-- Django 5+ POST Logout Form -->
+                <form action="{% url 'logout' %}" method="POST" class="logout-form">
+                    {% csrf_token %}
+                    <button type="submit" class="logout-btn">
+                        <i data-lucide="log-out" style="width: 16px; height: 16px;"></i>
+                        <span>Log out</span>
+                    </button>
+                </form>
+            </div>
+        </div>
+    </nav>
+</header>
+    </nav>
+</header>
+
+<main>
+
+    <div class="metrics-grid">
+        <div class="metric-card">
+            <span>Total Executions</span>
+            <h2>{{ trades|length }}</h2>
+        </div>
+        <div class="metric-card">
+            <span>Journal Status</span>
+            <h2 style="color: var(--accent-blue);">Active</h2>
+        </div>
+    </div>
+
+    <!-- TRADE FILTER FORM -->
+    <div class="filter-container">
+        <form method="GET" class="trade-filter">
+            <input
+                type="text"
+                name="symbol"
+                placeholder="Search symbol..."
+                value="{{ symbol }}"
+            >
+
+            <select name="side">
+                <option value="">All Sides</option>
+                <option value="buy" {% if side == "buy" %}selected{% endif %}>
+                    Buy
+                </option>
+                <option value="sell" {% if side == "sell" %}selected{% endif %}>
+                    Sell
+                </option>
+            </select>
+
+            <button type="submit" class="btn-primary">
+                Apply Filter
+            </button>
+
+            {% if symbol or side %}
+                <a href="{% url 'trade_list' %}" class="clear-btn">
+                    Clear Filters
+                </a>
+            {% endif %}
+        </form>
+    </div>
+
+    <!-- ACTIVE FILTERS BADGES -->
+    {% if symbol or side %}
+        <div class="active-filters">
+            <strong>Active filters:</strong>
+            {% if symbol %}
+                <span>Symbol: {{ symbol }}</span>
+            {% endif %}
+            {% if side %}
+                <span>Side: {{ side|upper }}</span>
+            {% endif %}
+        </div>
+    {% endif %}
+
+    <div class="section-header">
+        <h2>Executed Trades</h2>
+    </div>
+
+    <div class="trades-grid">
+        {% if trades %}
+            {% for trade in trades %}
+                <div class="trade-card">
+                    <div class="trade-header">
+                        <div class="symbol-tag">
+                            <h3>{{ trade.entry_symbol }}</h3>
+                            <span class="badge-side {% if trade.entry_side|lower == 'buy' or trade.entry_side|lower == 'long' %}badge-long{% else %}badge-short{% endif %}">
+                                {{ trade.entry_side }}
+                            </span>
+                        </div>
+                        <span style="font-size: 0.8rem; color: var(--text-muted);">#{{ trade.id }}</span>
+                    </div>
+
+                    <div class="trade-body">
+                        <div class="data-point">
+                            <label>Entry Price</label>
+                            <span>{{ trade.entry }}</span>
+                        </div>
+                        <div class="data-point">
+                            <label>Exit Price</label>
+                            <span>{{ trade.exit }}</span>
+                        </div>
+                        <div class="data-point">
+                            <label>Quantity</label>
+                            <span>{{ trade.quantity }}</span>
+                        </div>
+                        <div class="data-point">
+                            <label>Realized PnL</label>
+                            <span class="trade-pnl {% if trade.pnl >= 0 %}pnl-positive{% else %}pnl-negative{% endif %}">
+                                {{ trade.pnl }}
+                            </span>
+                        </div>
+                    </div>
+
+                    <div class="trade-actions">
+                        <a href="{% url 'update_trade' trade.id %}" class="action-link link-update">
+                            Edit
+                        </a>
+                        <a href="{% url 'delete_trade' trade.id %}" class="action-link link-delete">
+                            Delete
+                        </a>
+                    </div>
+                </div>
+            {% endfor %}
+        {% else %}
+            <div class="empty-state">
+                <i data-lucide="inbox" style="width: 48px; height: 48px;"></i>
+                <h3>No trades logged yet</h3>
+                <p>Start recording your strategy execution by clicking the button below.</p>
+                <a href="{% url 'add_trade' %}" class="nav-btn btn-primary" style="display: inline-flex;">
+                    <i data-lucide="plus" style="width: 16px; height: 16px;"></i> Add First Trade
+                </a>
+            </div>
+        {% endif %}
+    </div>
+
+</main>
+
+<footer>
+    <p>&copy; {% now "Y" %} Quantitative Trading Journal &bull; Built with Django</p>
+</footer>
+
+<script>
+    // Initialize icons
+    lucide.createIcons();
+
+    // Profile Dropdown Toggle
+    document.addEventListener('DOMContentLoaded', () => {
+        const profileContainer = document.querySelector('.profile-container');
+        const profileBtn = document.getElementById('profileDropdownBtn');
+
+        profileBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            profileContainer.classList.toggle('active');
+        });
+
+        document.addEventListener('click', (e) => {
+            if (!profileContainer.contains(e.target)) {
+                profileContainer.classList.remove('active');
+            }
+        });
+    });
+</script>
+
+</body>
+</html>
