@@ -11,7 +11,7 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 
 from pathlib import Path
-import os
+import os, dj_database_url
 from dotenv import load_dotenv
 
 
@@ -100,7 +100,15 @@ WSGI_APPLICATION = 'trading_journal.wsgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
-
+DATABASES = {
+    'default': dj_database_url.config(
+        default=f"postgresql://{os.getenv('DB_USER', 'postgres')}:{os.getenv('DB_PASSWORD', '9149')}@{os.getenv('DB_HOST', 'localhost')}:{os.getenv('DB_PORT', '5432')}/{os.getenv('DB_NAME', 'trading_journal')}",
+        conn_max_age=600,
+        ssl_require=True if os.getenv('DATABASE_URL') else False
+    
+    )
+}
+'''
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
@@ -111,7 +119,7 @@ DATABASES = {
         "PORT": os.getenv("DB_PORT"),
     }
 }
-
+'''
 
 # Password validation
 # https://docs.djangoproject.com/en/5.2/ref/settings/#auth-password-validators
