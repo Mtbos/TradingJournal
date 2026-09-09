@@ -40,7 +40,19 @@ if not DEBUG:
 
     SECURE_CONTENT_TYPE_NOSNIFF = True
 
-ALLOWED_HOSTS = []
+# Fixes CSRF verification failed errors on Vercel
+CSRF_TRUSTED_ORIGINS = [
+    'https://trading-journal-xis7.vercel.app',
+    'https://*.vercel.app',
+]
+
+# Tells Django to respect Vercel's HTTPS headers
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+
+ALLOWED_HOSTS = ['trading-journal-xis7.vercel.app',
+    '.vercel.app',  # Allows all subdomains under vercel.app
+    '127.0.0.1',
+    'localhost',]
 
 
 # Application definition
