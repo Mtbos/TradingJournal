@@ -94,11 +94,13 @@ WSGI_APPLICATION = 'trading_journal.wsgi.application'
 DATABASE_URL = os.getenv('DATABASE_URL')
 
 if DATABASE_URL:
+    # Database Setup
+    # dj_database_url reads DATABASE_URL directly from Vercel's environment variables or local os.environ
     DATABASES = {
         'default': dj_database_url.config(
-            default=DATABASE_URL,
+            default=os.getenv('DATABASE_URL', 'postgresql://postgres:postgres@localhost:5432/trading_journal'),
             conn_max_age=600,
-            ssl_require=True
+            ssl_require=True if os.getenv('DATABASE_URL') else False
         )
     }
 else:
