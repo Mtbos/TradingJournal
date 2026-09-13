@@ -3,7 +3,7 @@ from . import views
 from django.contrib.auth import views as auth_views
 urlpatterns = [
     
-    path('', RedirectView.as_view(url='/accounts/login/', permanent=False)),
+    path('', views.trade_list, name='trade_list'),
     path("add/", views.add_trade, name="add_trade"),
     path('<int:trade_id>/update', views.update_trade, name='update_trade'),
     path('<int:trade_id>/delete', views.delete_trade, name='delete_trade'),
