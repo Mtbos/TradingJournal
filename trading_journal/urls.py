@@ -21,4 +21,6 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path("trades/", include("trades.urls")),
     path('accounts/', include('accounts.urls')),
+    # Redirects the root URL (/) to the login page
+    path('', RedirectView.as_view(url='/accounts/login/', permanent=False)),
 ]
